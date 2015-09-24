@@ -2,13 +2,20 @@
 echo "---- Environment ----"
 env
 echo "---------------------"
-echo /bin/sed -i -e "s/INFLUXSERVER/${INFLUX_PORT_8086_TCP_ADDR}/g" -e "s/INFLUXSERVERPORT/${INFLUX_PORT_8086_TCP_PORT}/g" -e "s/FOXDENDB/${INFLUX_ENV_PRE_CREATE_DB}/g" /etc/nginx/nginx.conf 
-/bin/sed -i -e "s/INFLUXSERVER/${INFLUX_PORT_8086_TCP_ADDR}/" -e "s/INFLUXSERVERPORT/${INFLUX_PORT_8086_TCP_PORT}/" -e "s/FOXDENDB/${INFLUX_ENV_PRE_CREATE_DB}/" /etc/nginx/nginx.conf 
 
-echo /bin/sed -i -e "s/INFLUXADMINSERVER/${INFLUX_PORT_8083_TCP_ADDR}/" -e "s/INFLUXADMINSERVERPORT/${INFLUX_PORT_8083_TCP_PORT}/" /etc/nginx/nginx.conf 
-/bin/sed -i -e "s/INFLUXADMINSERVER/${INFLUX_PORT_8083_TCP_ADDR}/" -e "s/INFLUXADMINSERVERPORT/${INFLUX_PORT_8083_TCP_PORT}/" /etc/nginx/nginx.conf 
+function run {
+  echo "${@}"
+  "${@}"
+}
 
-echo /bin/sed -i -e "s/WOUSER/${WO_USER}/" -e "s/WOPASS/${WO_PASS}/" /etc/nginx/nginx.conf 
-/bin/sed -i -e "s/WOUSER/${WO_USER}/" -e "s/WOPASS/${WO_PASS}/" /etc/nginx/nginx.conf 
+run /bin/sed -i \
+  -e "s/INFLUX_PORT_8086_TCP_ADDR/${INFLUX_PORT_8086_TCP_ADDR}/g" \
+  -e "s/INFLUX_PORT_8086_TCP_PORT/${INFLUX_PORT_8086_TCP_PORT:-8086}/g" \
+  -e "s/INFLUX_ENV_PRE_CREATE_DB/${INFLUX_ENV_PRE_CREATE_DB}/g" \
+  -e "s/INFLUX_PORT_8083_TCP_ADDR/${INFLUX_PORT_8083_TCP_ADDR:-${INFLUX_PORT_8086_TCP_ADDR}}/g" \
+  -e "s/INFLUX_PORT_8083_TCP_PORT/${INFLUX_PORT_8083_TCP_PORT:-8083}/g" \
+  -e "s/WO_USER/${WO_USER}/g" \
+  -e "s/WO_PASS/${WO_PASS}/g" \
+  /etc/nginx/nginx.conf
 
 nginx
